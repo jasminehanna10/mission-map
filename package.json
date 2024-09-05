@@ -1,0 +1,16 @@
+{
+  "name": "mission-map",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Jasmine Hanna",
+  "license": "ISC",
+  "description": "A mission map for the 2024 MEC Fall Conference to serve as a live feed map.",
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}
