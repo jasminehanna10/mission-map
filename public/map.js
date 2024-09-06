@@ -8,7 +8,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // Connect to the server
 var socket = io();
 socket.on('connect', function() {
-    alert('Socket.io connected!');
+  //  alert('Socket.io connected!');
 });
 
 // Add marker on map click
