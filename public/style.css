@@ -9,7 +9,7 @@ body {
 /* Style for the logo */
 .logo-container {
     position: absolute; /* Position the logo in the upper right */
-    top: 90px; /* Adjust the top spacing */
+    top: 100px; /* Adjust the top spacing */
     right: 10px; /* Adjust the right spacing */
 }
 
