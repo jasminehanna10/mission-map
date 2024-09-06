@@ -1,34 +1,55 @@
 const express = require('express');
 const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+const fs = require('fs'); // To read/write JSON files
 const path = require('path');
-const http = require('http');
-const socketIo = require('socket.io');
 
-// Set the port to use Heroku’s dynamically assigned port or default to 3000
-const PORT = process.env.PORT || 3000;
+const pinsFile = path.join(__dirname, 'pins.json');
 
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files from the "public" directory
+app.use(express.static('public'));
 
-// Handle the basic root request and serve index.html
+// Read existing pins from the JSON file
+let pins = [];
+if (fs.existsSync(pinsFile)) {
+    const data = fs.readFileSync(pinsFile);
+    pins = JSON.parse(data);
+}
+
+// Serve the map page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(__dirname + '/public/index.html');
 });
 
-// Start the server
-const server = http.createServer(app);
-const io = socketIo(server);
-
-// Handle socket connections
+// On client connection
 io.on('connection', (socket) => {
     console.log('A user connected');
+
+    // Send all saved pins to the connected client
+    socket.emit('load pins', pins);
+
+    // Listen for new pins
     socket.on('new mission', (data) => {
+        // Save the new pin in memory
+        pins.push(data);
+
+        // Broadcast the new pin to all clients
         io.emit('update map', data);
+
+        // Save the pins to the JSON file
+        fs.writeFileSync(pinsFile, JSON.stringify(pins, null, 2));
+    });
+
+    // Handle client disconnection
+    socket.on('disconnect', () => {
+        console.log('A user disconnected');
     });
 });
 
-// Listen on the correct port
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// Start the server
+const port = process.env.PORT || 3000;
+http.listen(port, () => {
+    console.log(`Server running on port ${port}`);
 });
 

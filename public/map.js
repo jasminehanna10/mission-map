@@ -7,8 +7,14 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Connect to the server
 var socket = io();
-socket.on('connect', function() {
-  //  alert('Socket.io connected!');
+
+// Load existing pins from the server
+socket.on('load pins', function(pins) {
+    pins.forEach(function(pin) {
+        L.marker([pin.lat, pin.lng]).addTo(map)
+            .bindPopup(pin.info)
+            .openPopup();
+    });
 });
 
 // Add marker on map click
@@ -16,7 +22,8 @@ map.on('click', function(e) {
     var latLng = e.latlng;
     var missionInfo = prompt('Enter mission work details:');
     if (missionInfo) {
-        socket.emit('new mission', { lat: latLng.lat, lng: latLng.lng, info: missionInfo });
+        var pinData = { lat: latLng.lat, lng: latLng.lng, info: missionInfo };
+        socket.emit('new mission', pinData);
     }
 });
 
