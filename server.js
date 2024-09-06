@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const fs = require('fs'); // To read/write JSON files
+const fs = require('fs');
 const path = require('path');
 
 const pinsFile = path.join(__dirname, 'pins.json');
@@ -38,6 +38,18 @@ io.on('connection', (socket) => {
         io.emit('update map', data);
 
         // Save the pins to the JSON file
+        fs.writeFileSync(pinsFile, JSON.stringify(pins, null, 2));
+    });
+
+    // *** Add this block to handle pin removal ***
+    socket.on('remove mission', (latLng) => {
+        // Find and remove the pin
+        pins = pins.filter(pin => pin.lat !== latLng.lat || pin.lng !== latLng.lng);
+
+        // Broadcast the removal to all clients
+        io.emit('remove map pin', latLng);
+
+        // Save the updated pins to the JSON file
         fs.writeFileSync(pinsFile, JSON.stringify(pins, null, 2));
     });
 
