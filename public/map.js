@@ -42,13 +42,18 @@ function addMarker(data) {
             socket.emit('remove mission', { lat: data.lat, lng: data.lng });
         }
     });
+
+    // Store marker reference on the marker object itself for easy removal
+    marker._latLngData = data;
 }
 
 // Listen for pin removal from the server
 socket.on('remove map pin', function(latLng) {
     map.eachLayer(function(layer) {
         if (layer instanceof L.Marker) {
-            if (layer.getLatLng().lat === latLng.lat && layer.getLatLng().lng === latLng.lng) {
+            // Compare lat/lng to find the correct marker to remove
+            var markerData = layer._latLngData; // Get the stored lat/lng data
+            if (markerData && markerData.lat === latLng.lat && markerData.lng === latLng.lng) {
                 map.removeLayer(layer);
             }
         }
