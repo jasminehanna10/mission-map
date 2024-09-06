@@ -14,7 +14,7 @@ body {
 }
 
 .logo {
-    width: 50px; /* Make the logo smaller */
+    width: 40px; /* Make the logo smaller */
     height: auto; /* Maintain aspect ratio */
 }
 
