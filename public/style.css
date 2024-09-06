@@ -9,12 +9,12 @@ body {
 /* Style for the logo */
 .logo-container {
     position: absolute; /* Position the logo in the upper right */
-    top: 20px; /* Adjust the top spacing */
+    top: 10px; /* Adjust the top spacing */
     right: 20px; /* Adjust the right spacing */
 }
 
 .logo {
-    width: 80px; /* Make the logo smaller */
+    width: 50px; /* Make the logo smaller */
     height: auto; /* Maintain aspect ratio */
 }
 
@@ -27,12 +27,14 @@ h1 {
 }
 
 h2 {
-    font-size: 1.2em; /* Smaller font size for <h2> */
-    margin-top: 0; /* Reduce space between <h1> and <h2> */
-    font-weight: normal; /* Make the <h2> text lighter */
+    font-size: 1.1em; /* Smaller font size for <h2> */
+    margin-top: 0 auto; /* Reduce space between <h1> and <h2> */
+    font-weight: 400; /* Make the <h2> text lighter */
     color: white; /* Subheading color */
     background-color: #85161f; /* Background color for better contrast */
     padding: 10px; /* Padding around the subheading */
+    width: 80%;
+
 }
 
 /* Map styling */
@@ -40,5 +42,6 @@ h2 {
     height: 600px; /* Set a height for the map */
     width: 100%;
     margin-top: 20px;
+    border: 2px solid #85161f;
 }
 
