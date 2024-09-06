@@ -11,9 +11,7 @@ var socket = io();
 // Load existing pins from the server
 socket.on('load pins', function(pins) {
     pins.forEach(function(pin) {
-        L.marker([pin.lat, pin.lng]).addTo(map)
-            .bindPopup(pin.info)
-            .openPopup();
+        addMarker(pin);
     });
 });
 
@@ -29,8 +27,31 @@ map.on('click', function(e) {
 
 // Listen for map updates from other users
 socket.on('update map', function(data) {
-    L.marker([data.lat, data.lng]).addTo(map)
+    addMarker(data);
+});
+
+// Function to add a marker and handle removal
+function addMarker(data) {
+    var marker = L.marker([data.lat, data.lng]).addTo(map)
         .bindPopup(data.info)
         .openPopup();
+
+    // Add event listener for pin removal
+    marker.on('click', function() {
+        if (confirm('Do you want to remove this mission pin?')) {
+            socket.emit('remove mission', { lat: data.lat, lng: data.lng });
+        }
+    });
+}
+
+// Listen for pin removal from the server
+socket.on('remove map pin', function(latLng) {
+    map.eachLayer(function(layer) {
+        if (layer instanceof L.Marker) {
+            if (layer.getLatLng().lat === latLng.lat && layer.getLatLng().lng === latLng.lng) {
+                map.removeLayer(layer);
+            }
+        }
+    });
 });
 
