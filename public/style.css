@@ -1,19 +1,44 @@
+/* Global styling */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: center; /* Centers text globally */
+    font-family: Arial, sans-serif; /* Cleaner font */
+    background-color: #f4f4f4; /* Optional: Light background for contrast */
+    position: relative; /* Ensures positioning for logo */
 }
 
+/* Style for the logo */
+.logo-container {
+    position: absolute; /* Position the logo in the upper right */
+    top: 20px; /* Adjust the top spacing */
+    right: 20px; /* Adjust the right spacing */
+}
+
+.logo {
+    width: 80px; /* Make the logo smaller */
+    height: auto; /* Maintain aspect ratio */
+}
+
+/* Title and subtitle */
 h1 {
-    margin: 20px;
-    font-size: 24px;
+    font-size: 2.5em;
+    margin-bottom: 0.2em;
+    color: #85161f; /* Title color */
+    font-family: 'Optima', sans-serif; /* Optima font */
 }
 
+h2 {
+    font-size: 1.2em; /* Smaller font size for <h2> */
+    margin-top: 0; /* Reduce space between <h1> and <h2> */
+    font-weight: normal; /* Make the <h2> text lighter */
+    color: white; /* Subheading color */
+    background-color: #85161f; /* Background color for better contrast */
+    padding: 10px; /* Padding around the subheading */
+}
+
+/* Map styling */
 #map {
-    height: 80vh;
-    width: 90vw;
+    height: 600px; /* Set a height for the map */
+    width: 100%;
+    margin-top: 20px;
 }
 
