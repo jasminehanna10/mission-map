@@ -1,9 +1,22 @@
-var map = L.map('map').setView([0, 0], 2);  // Center of the world
+var map = L.map('map').setView([37.5, -119], 6);  // Center on California
 
 // Add OpenStreetMap tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
+
+// Set bounds for California
+var californiaBounds = [
+    [32.5343, -124.4096],  // Southwest corner
+    [42.0095, -114.1315]   // Northeast corner
+];
+
+// Restrict the map view to California bounds
+map.setMaxBounds(californiaBounds);
+
+// Prevent zooming out too far
+map.setMinZoom(6);
+map.setMaxZoom(10);
 
 // Connect to the server
 var socket = io();
@@ -15,13 +28,19 @@ socket.on('load pins', function(pins) {
     });
 });
 
-// Add marker on map click
+// Add marker on map click, only if inside California
 map.on('click', function(e) {
     var latLng = e.latlng;
-    var missionInfo = prompt('Enter mission work details:');
-    if (missionInfo) {
-        var pinData = { lat: latLng.lat, lng: latLng.lng, info: missionInfo };
-        socket.emit('new mission', pinData);
+
+    // Check if the clicked location is within the California bounds
+    if (latLng.lat >= 32.5343 && latLng.lat <= 42.0095 && latLng.lng >= -124.4096 && latLng.lng <= -114.1315) {
+        var missionInfo = prompt('Enter mission work details:');
+        if (missionInfo) {
+            var pinData = { lat: latLng.lat, lng: latLng.lng, info: missionInfo };
+            socket.emit('new mission', pinData);
+        }
+    } else {
+        alert('You can only add mission pins within California.');
     }
 });
 
@@ -51,8 +70,7 @@ function addMarker(data) {
 socket.on('remove map pin', function(latLng) {
     map.eachLayer(function(layer) {
         if (layer instanceof L.Marker) {
-            // Compare lat/lng to find the correct marker to remove
-            var markerData = layer._latLngData; // Get the stored lat/lng data
+            var markerData = layer._latLngData;
             if (markerData && markerData.lat === latLng.lat && markerData.lng === latLng.lng) {
                 map.removeLayer(layer);
             }
