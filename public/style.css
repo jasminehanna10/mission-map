@@ -2,19 +2,22 @@
 body {
     text-align: center; /* Centers text globally */
     font-family: Arial, sans-serif; /* Cleaner font */
-    background-color: #f4f4f4; /* Optional: Light background for contrast */
+    background-image: url('brownMap.jpg'); /* Set background image */
+    background-size: cover; /* Ensure the image covers the entire background */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Prevent the image from repeating */
     position: relative; /* Ensures positioning for logo */
 }
 
 /* Style for the logo */
 .logo-container {
     position: absolute; /* Position the logo in the upper right */
-    top: 100px; /* Adjust the top spacing */
+    top: 50px; /* Adjust the top spacing */
     right: 10px; /* Adjust the right spacing */
 }
 
 .logo {
-    width: 40px; /* Make the logo smaller */
+    width: 45px; /* Make the logo smaller */
     height: auto; /* Maintain aspect ratio */
 }
 
