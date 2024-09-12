@@ -19,8 +19,8 @@ map.on('drag', function() {
 });
 
 // Prevent zooming out too far
-map.setMinZoom(6);
-map.setMaxZoom(10);
+map.setMinZoom(3);
+map.setMaxZoom(15);
 
 // Connect to the server
 var socket = io();
