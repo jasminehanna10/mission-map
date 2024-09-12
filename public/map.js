@@ -1,18 +1,22 @@
-var map = L.map('map').setView([37.5, -119], 6);  // Center on California
+var map = L.map('map').setView([35.5, -119.5], 6);  // Center the map between Berkeley and Tijuana
 
 // Add OpenStreetMap tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// Set bounds for California
+
+// Set bounds for California (from Tijuana, Mexico to Berkeley, CA)
 var californiaBounds = [
-    [32.5343, -124.4096],  // Southwest corner
-    [42.0095, -114.1315]   // Northeast corner
+    [32.5343, -124.4096],  // Southwest corner (Tijuana area)
+    [42.0095, -114.1315]   // Northeast corner (California/Nevada border, near Oregon)
 ];
 
 // Restrict the map view to California bounds
 map.setMaxBounds(californiaBounds);
+map.on('drag', function() {
+    map.panInsideBounds(californiaBounds, { animate: true });
+});
 
 // Prevent zooming out too far
 map.setMinZoom(6);
