@@ -1,5 +1,5 @@
-var socket = io(); // Initializes the socket connection
 const API_KEY = 'c21d1bb174d74027af4df2ce25cde9a1';
+var socket = io(); // Initializes the socket connection
 
 // Function to handle geocoding
 async function geocodeAddress(address) {
@@ -113,6 +113,4 @@ function addPinByAddress() {
     } else {
         alert("Please fill out both name and address fields.");
     }
-
-});
-
+ }
