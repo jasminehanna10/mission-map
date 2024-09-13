@@ -1,3 +1,19 @@
+var map = L.map('map').setView([34.0522, -118.2437], 9); // Set default center and zoom level
+
+// Add OpenStreetMap tiles
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Set bounds for California
+var californiaBounds = [
+    [32.5343, -124.4096],  // Southwest corner
+    [37.0000, -118.0000]   // Northeast corner (adjusted for SoCal)
+];
+map.setMaxBounds(californiaBounds);
+map.fitBounds(californiaBounds); // Ensure map is centered within these bounds
+
+
 // Function to add marker and include removal option
 function addMarkerToMap(data) {
     const marker = L.marker([data.lat, data.lng]).addTo(map)
