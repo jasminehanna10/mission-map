@@ -1,21 +1,16 @@
-// Map initialization with view restricted to California
+// Map initialization with view restricted to California and zoom limits
 var map = L.map('map', {
     center: [36.7783, -119.4179], // Centering on California
     zoom: 7, // Starting zoom level
     minZoom: 6, // Minimum zoom level (to prevent zooming out too far)
     maxZoom: 14, // Maximum zoom level (to prevent zooming in too close)
-    maxBounds: [[32.5343, -124.4096], [36.7378, -119.7871]], // Boundaries of California
+    maxBounds: [[32.5343, -124.4096], [36.7378, -119.7871]], // Boundaries: Southwest to Fresno
 });
 
 // Add OpenStreetMap tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
-
-map.setMaxBounds([
-    [32.5343, -124.4096],  // Southwest corner of California
-    [36.7378, -119.7871]   // Northeast corner of California
-]);
 
 // Fetch function to get geocoded coordinates
 async function geocodeAddress(address) {
@@ -67,16 +62,39 @@ var socket = io();
 // Load pins when the map initializes
 socket.on('load pins', function (pins) {
     pins.forEach(function (pin) {
-        L.marker([pin.lat, pin.lng]).addTo(map)
-            .bindPopup(pin.info)
-            .openPopup();
+        addMarkerToMap(pin);
     });
 });
 
+// Add a pin to the map and include a removal option
+function addMarkerToMap(data) {
+    const marker = L.marker([data.lat, data.lng]).addTo(map)
+        .bindPopup(`${data.info} <br><button onclick="removePin(${data.lat}, ${data.lng})">Remove Pin</button>`)
+        .openPopup();
+}
+
 // Add the new pin to the map when a new mission is received
 socket.on('update map', function (data) {
-    L.marker([data.lat, data.lng]).addTo(map)
-        .bindPopup(data.info)
-        .openPopup();
+    addMarkerToMap(data);
+});
+
+// Function to remove a pin
+function removePin(lat, lng) {
+    if (confirm('Are you sure you want to remove this pin?')) {
+        socket.emit('remove mission', { lat, lng });
+    }
+}
+
+// Listen for pin removal event from the server
+socket.on('remove pin', function (latLng) {
+    // Find the marker with the given lat/lng and remove it from the map
+    map.eachLayer(function (layer) {
+        if (layer instanceof L.Marker) {
+            const { lat, lng } = layer.getLatLng();
+            if (lat === latLng.lat && lng === latLng.lng) {
+                map.removeLayer(layer);
+            }
+        }
+    });
 });
 
