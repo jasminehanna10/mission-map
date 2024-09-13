@@ -1,63 +1,25 @@
-// Map initialization with view restricted to California and zoom limits
-var map = L.map('map', {
-    center: [36.7783, -119.4179], // Centering on California
-    zoom: 7, // Starting zoom level
-    minZoom: 6, // Minimum zoom level (to prevent zooming out too far)
-    maxZoom: 14, // Maximum zoom level (to prevent zooming in too close)
-    maxBounds: [[32.5343, -124.4096], [36.7378, -119.7871]], // Boundaries: Southwest to Fresno
-});
-
-// Add OpenStreetMap tiles
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-// Fetch function to get geocoded coordinates
-async function geocodeAddress(address) {
-    const apiKey = 'c21d1bb174d74027af4df2ce25cde9a1'; // Your OpenCage API key
-    const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=${apiKey}`;
-    
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.results && data.results.length > 0) {
-            return data.results[0].geometry; // Return the first result's geometry (lat, lng)
-        } else {
-            alert('Address not found!');
-            return null;
-        }
-    } catch (error) {
-        console.error('Error fetching geocode data:', error);
-        alert('An error occurred while fetching location data.');
-        return null;
-    }
+// Function to add marker and include removal option
+function addMarkerToMap(data) {
+    const marker = L.marker([data.lat, data.lng]).addTo(map)
+        .bindPopup(`${data.info} <br><button onclick="removePin(${data.lat}, ${data.lng}, this)">Remove Pin</button>`);
 }
 
-// Listen for form submission
-document.getElementById('pin-form').addEventListener('submit', async function (e) {
-    e.preventDefault(); // Prevent the form from submitting in the traditional way
-    
-    const name = document.getElementById('userName').value;
-    const address = document.getElementById('userAddress').value;
+// Function to remove pin (this emits the event to the server)
+function removePin(lat, lng, button) {
+    if (confirm('Are you sure you want to remove this pin?')) {
+        socket.emit('remove mission', { lat: lat, lng: lng });
 
-    if (!name || !address) {
-        alert('Please enter both your name and an address.');
-        return;
+        // Remove the pin from the map immediately for the user who clicked the button
+        map.eachLayer(function (layer) {
+            if (layer instanceof L.Marker) {
+                const { lat: markerLat, lng: markerLng } = layer.getLatLng();
+                if (markerLat === lat && markerLng === lng) {
+                    map.removeLayer(layer);
+                }
+            }
+        });
     }
-
-    // Geocode the address
-    const latLng = await geocodeAddress(address);
-    
-    if (latLng) {
-        // Create a new pin and add it to the map
-        const pinData = { lat: latLng.lat, lng: latLng.lng, info: `${name}: ${address}` };
-        socket.emit('new mission', pinData); // Emit the new pin to the server
-    }
-});
-
-// Connect to the server using socket.io
-var socket = io();
+}
 
 // Load pins when the map initializes
 socket.on('load pins', function (pins) {
@@ -66,28 +28,13 @@ socket.on('load pins', function (pins) {
     });
 });
 
-// Add a pin to the map and include a removal option
-function addMarkerToMap(data) {
-    const marker = L.marker([data.lat, data.lng]).addTo(map)
-        .bindPopup(`${data.info} <br><button onclick="removePin(${data.lat}, ${data.lng})">Remove Pin</button>`)
-        .openPopup();
-}
-
-// Add the new pin to the map when a new mission is received
+// Add new pin when the 'new mission' event is received
 socket.on('update map', function (data) {
     addMarkerToMap(data);
 });
 
-// Function to remove a pin
-function removePin(lat, lng) {
-    if (confirm('Are you sure you want to remove this pin?')) {
-        socket.emit('remove mission', { lat, lng });
-    }
-}
-
-// Listen for pin removal event from the server
+// Remove the pin when the 'remove pin' event is received from the server
 socket.on('remove pin', function (latLng) {
-    // Find the marker with the given lat/lng and remove it from the map
     map.eachLayer(function (layer) {
         if (layer instanceof L.Marker) {
             const { lat, lng } = layer.getLatLng();
@@ -96,5 +43,54 @@ socket.on('remove pin', function (latLng) {
             }
         }
     });
+});
+
+// Add bounds and set the map to only show the southern California region
+var socalBounds = [
+    [32.5343, -124.4096],  // Southwest corner (Tijuana)
+    [37.5, -114.1315]      // Northeast corner (around Fresno)
+];
+
+// Restrict the map view to Southern California bounds
+var map = L.map('map', {
+    maxBounds: socalBounds,
+    zoomControl: true,
+    minZoom: 6,  // Limit how far out they can zoom
+    maxZoom: 12  // Limit how close they can zoom in
+}).setView([34.0522, -118.2437], 8); // Initial view centered on Los Angeles
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Add event listener to 'Add Pin' button for manual entry
+document.getElementById('addPinBtn').addEventListener('click', function () {
+    const name = document.getElementById('nameInput').value;
+    const address = document.getElementById('addressInput').value;
+
+    if (!name || !address) {
+        alert('Please fill out both the name and address.');
+        return;
+    }
+
+    fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=YOUR_API_KEY`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.results.length > 0) {
+                const latLng = data.results[0].geometry;
+
+                // Emit the new pin to the server
+                socket.emit('new mission', { lat: latLng.lat, lng: latLng.lng, info: `${name}: ${address}` });
+
+                // Optionally clear the input fields
+                document.getElementById('nameInput').value = '';
+                document.getElementById('addressInput').value = '';
+            } else {
+                alert('Address not found. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching geocode data:', error);
+        });
 });
 
