@@ -1,3 +1,4 @@
+var socket = io(); // Initializes the socket connection
 const API_KEY = 'c21d1bb174d74027af4df2ce25cde9a1';
 
 // Function to handle geocoding
@@ -82,29 +83,37 @@ socket.on('remove pin', function (latLng) {
 });
 
 // Function to handle form submission and geocoding
-document.getElementById('pin-form').addEventListener('submit', async function(event) {
-    event.preventDefault();  // Prevent the form from reloading the page
+function addPinByAddress() {
+    const address = document.getElementById('address-input').value;
+    const name = document.getElementById('name-input').value;
 
-    const userName = document.getElementById('userName').value;
-    const userAddress = document.getElementById('userAddress').value;
+    if (address && name) {
+        fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=${API_KEY}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.results.length > 0) {
+                    const latLng = data.results[0].geometry;
+                    const lat = latLng.lat;
+                    const lng = latLng.lng;
 
-    if (userName && userAddress) {
-        const location = await geocodeAddress(userAddress);
-        if (location) {
-            // Emit the new mission event with the coordinates and user info
-            const pinData = {
-                lat: location.lat,
-                lng: location.lng,
-                info: `${userName} at ${userAddress}`
-            };
+                    // Add marker to the map
+                    const markerData = { lat: lat, lng: lng, info: name };
+                    addMarkerToMap(markerData);
 
-            socket.emit('new mission', pinData);  // Send the pin to the server
-
-            // Add the pin locally for immediate feedback
-            addMarkerToMap(pinData);
-        }
+                    // Optionally, send the new pin data to the server
+                    socket.emit('new mission', markerData);
+                } else {
+                    alert("Address not found. Please enter a valid address.");
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching geocoding data:", error);
+                alert("There was an error finding the location. Please try again.");
+            });
     } else {
-        alert("Please enter both name and address.");
+        alert("Please fill out both name and address fields.");
     }
+}
+
 });
 
