@@ -1,11 +1,32 @@
-var map = L.map('map').setView([34.0522, -118.2437], 9); // Set default center and zoom level
+const API_KEY = 'c21d1bb174d74027af4df2ce25cde9a1';
 
-// Add OpenStreetMap tiles
+// Function to handle geocoding
+async function geocodeAddress(address) {
+    const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=${API_KEY}`;
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data.results && data.results.length > 0) {
+            const location = data.results[0].geometry;
+            return location;  // return {lat: ..., lng: ...}
+        } else {
+            throw new Error('No results found for the provided address.');
+        }
+    } catch (error) {
+        console.error('Error fetching geocode data:', error);
+        alert('There was an issue finding that address. Please try again.');
+        return null;
+    }
+}
+
+// Initialize the map, set it to Southern California area
+var map = L.map('map').setView([34.0522, -118.2437], 9);  // Set view to Los Angeles as the default
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// Set bounds for California
+// Set bounds for Southern California
 var californiaBounds = [
     [32.5343, -124.4096],  // Southwest corner
     [37.0000, -118.0000]   // Northeast corner (adjusted for SoCal)
@@ -13,8 +34,7 @@ var californiaBounds = [
 map.setMaxBounds(californiaBounds);
 map.fitBounds(californiaBounds); // Ensure map is centered within these bounds
 
-
-// Function to add marker and include removal option
+// Function to add a marker and include a removal button in the popup
 function addMarkerToMap(data) {
     const marker = L.marker([data.lat, data.lng]).addTo(map)
         .bindPopup(`${data.info} <br><button onclick="removePin(${data.lat}, ${data.lng}, this)">Remove Pin</button>`);
@@ -61,36 +81,30 @@ socket.on('remove pin', function (latLng) {
     });
 });
 
-// Geocoding and Adding Pin by Address
-function addPinByAddress() {
-    const address = document.getElementById('address-input').value;
-    const name = document.getElementById('name-input').value;
+// Function to handle form submission and geocoding
+document.getElementById('pin-form').addEventListener('submit', async function(event) {
+    event.preventDefault();  // Prevent the form from reloading the page
 
-    if (address && name) {
-        fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=YOUR_API_KEY`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.results.length > 0) {
-                    const latLng = data.results[0].geometry;
-                    const lat = latLng.lat;
-                    const lng = latLng.lng;
+    const userName = document.getElementById('userName').value;
+    const userAddress = document.getElementById('userAddress').value;
 
-                    // Add marker to the map
-                    const markerData = { lat: lat, lng: lng, info: name };
-                    addMarkerToMap(markerData);
+    if (userName && userAddress) {
+        const location = await geocodeAddress(userAddress);
+        if (location) {
+            // Emit the new mission event with the coordinates and user info
+            const pinData = {
+                lat: location.lat,
+                lng: location.lng,
+                info: `${userName} at ${userAddress}`
+            };
 
-                    // Optionally, send the new pin data to the server
-                    socket.emit('new mission', markerData);
-                } else {
-                    alert("Address not found. Please enter a valid address.");
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching geocoding data:", error);
-                alert("There was an error finding the location. Please try again.");
-            });
+            socket.emit('new mission', pinData);  // Send the pin to the server
+
+            // Add the pin locally for immediate feedback
+            addMarkerToMap(pinData);
+        }
     } else {
-        alert("Please fill out both name and address fields.");
+        alert("Please enter both name and address.");
     }
-}
+});
 
