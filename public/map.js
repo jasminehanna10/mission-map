@@ -21,8 +21,15 @@ async function geocodeAddress(address) {
     }
 }
 
-// Initialize the map, set it to Southern California area
-var map = L.map('map').setView([34.0522, -118.2437], 9);  // Set view to Los Angeles as the default
+// Initialize the map and set it to Los Angeles/Orange County
+var map = L.map('map', {
+    center: [33.6846, -117.8265],  // Coordinates near Orange County, CA
+    zoom: 10,  // Zoom level to focus on LA/OC
+    minZoom: 9,  // Minimum zoom level to prevent zooming too far out
+    maxZoom: 12  // Maximum zoom level to prevent zooming too far in
+});
+
+// Add OpenStreetMap tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
@@ -30,7 +37,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // Set bounds for Southern California
 var californiaBounds = [
     [32.5343, -124.4096],  // Southwest corner
-    [37.0000, -118.0000]   // Northeast corner (adjusted for SoCal)
+    [35.0000, -116.0000]   // Northeast corner (adjusted for SoCal)
 ];
 map.setMaxBounds(californiaBounds);
 map.fitBounds(californiaBounds); // Ensure map is centered within these bounds
