@@ -1,10 +1,17 @@
+import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import fetch from 'node-fetch';
-const express = require('express');
+
 const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
-const fs = require('fs');
-const path = require('path');
+const httpServer = createServer(app);
+const io = new Server(httpServer);
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const pinsFile = path.join(__dirname, 'pins.json');
 
@@ -20,7 +27,7 @@ if (fs.existsSync(pinsFile)) {
 
 // Serve the map page
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
+    res.sendFile(path.join(__dirname, '/public/index.html'));
 });
 
 // On client connection
@@ -42,7 +49,7 @@ io.on('connection', (socket) => {
         fs.writeFileSync(pinsFile, JSON.stringify(pins, null, 2));
     });
 
-    // *** Add this block to handle pin removal ***
+    // Handle pin removal
     socket.on('remove mission', (latLng) => {
         // Find and remove the pin
         pins = pins.filter(pin => pin.lat !== latLng.lat || pin.lng !== latLng.lng);
@@ -53,16 +60,10 @@ io.on('connection', (socket) => {
         // Save the updated pins to the JSON file
         fs.writeFileSync(pinsFile, JSON.stringify(pins, null, 2));
     });
-
-    // Handle client disconnection
-    socket.on('disconnect', () => {
-        console.log('A user disconnected');
-    });
 });
 
 // Start the server
-const port = process.env.PORT || 3000;
-http.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+httpServer.listen(process.env.PORT || 3000, () => {
+    console.log('Server running on port ' + (process.env.PORT || 3000));
 });
 
