@@ -1,17 +1,21 @@
 // Map initialization with view restricted to California
-var map = L.map('map').setView([36.7783, -119.4179], 6);  // California view
+var map = L.map('map', {
+    center: [36.7783, -119.4179], // Centering on California
+    zoom: 7, // Starting zoom level
+    minZoom: 6, // Minimum zoom level (to prevent zooming out too far)
+    maxZoom: 14, // Maximum zoom level (to prevent zooming in too close)
+    maxBounds: [[32.5343, -124.4096], [42.0095, -114.1315]], // Boundaries of California
+});
 
 // Add OpenStreetMap tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// Set bounds for California
-var californiaBounds = [
-    [32.5343, -124.4096],  // Southwest corner
-    [42.0095, -114.1315]   // Northeast corner
-];
-map.setMaxBounds(californiaBounds);
+map.setMaxBounds([
+    [32.5343, -124.4096],  // Southwest corner of California
+    [42.0095, -114.1315]   // Northeast corner of California
+]);
 
 // Fetch function to get geocoded coordinates
 async function geocodeAddress(address) {
