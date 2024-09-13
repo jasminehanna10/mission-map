@@ -30,15 +30,16 @@ h1 {
 }
 
 h2 {
-    font-size: 1.1em; /* Smaller font size for <h2> */
-    margin-top: 0 auto; /* Reduce space between <h1> and <h2> */
+    font-size: 1.1em; /* Smaller font size */
+    margin-top: 0; /* Reduce space between <h1> and <h2> */
+    margin-bottom: 20px; /* Add space below <h2> */
     font-weight: 400; /* Make the <h2> text lighter */
     color: white;
     background-color: #85161f; /* Background color for better contrast */
     padding: 10px; /* Padding around the subheading */
     display: inline-block; /* Allows the element to be centered */
-    margin: 0 auto; /* Centers the box horizontally */
-	text-align: center; /* Ensures text inside is centered */
+    margin: 0 auto 20px auto; /* Centers the box horizontally and adds space below */
+    text-align: center; /* Ensures text inside is centered */
 }
 
 /* Map styling */
