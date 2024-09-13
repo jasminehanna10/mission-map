@@ -45,53 +45,36 @@ socket.on('remove pin', function (latLng) {
     });
 });
 
-// Add bounds and set the map to only show the southern California region
-var socalBounds = [
-    [32.5343, -124.4096],  // Southwest corner (Tijuana)
-    [37.5, -114.1315]      // Northeast corner (around Fresno)
-];
+// Geocoding and Adding Pin by Address
+function addPinByAddress() {
+    const address = document.getElementById('address-input').value;
+    const name = document.getElementById('name-input').value;
 
-// Initialize the map centered on Southern California
-var map = L.map('map', {
-    center: [34.0522, -118.2437],  // Center on Los Angeles
-    zoom: 7,  // A good zoom level for Southern California
-    maxBounds: socalBounds,  // Limit map movement to SoCal
-    maxZoom: 11,  // Maximum zoom level
-    minZoom: 6  // Minimum zoom level to prevent zooming out too far
-});
+    if (address && name) {
+        fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=YOUR_API_KEY`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.results.length > 0) {
+                    const latLng = data.results[0].geometry;
+                    const lat = latLng.lat;
+                    const lng = latLng.lng;
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
+                    // Add marker to the map
+                    const markerData = { lat: lat, lng: lng, info: name };
+                    addMarkerToMap(markerData);
 
-// Add event listener to 'Add Pin' button for manual entry
-document.getElementById('addPinBtn').addEventListener('click', function () {
-    const name = document.getElementById('nameInput').value;
-    const address = document.getElementById('addressInput').value;
-
-    if (!name || !address) {
-        alert('Please fill out both the name and address.');
-        return;
+                    // Optionally, send the new pin data to the server
+                    socket.emit('new mission', markerData);
+                } else {
+                    alert("Address not found. Please enter a valid address.");
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching geocoding data:", error);
+                alert("There was an error finding the location. Please try again.");
+            });
+    } else {
+        alert("Please fill out both name and address fields.");
     }
-
-    fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=c21d1bb174d74027af4df2ce25cde9a`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.results.length > 0) {
-                const latLng = data.results[0].geometry;
-
-                // Emit the new pin to the server
-                socket.emit('new mission', { lat: latLng.lat, lng: latLng.lng, info: `${name}: ${address}` });
-
-                // Optionally clear the input fields
-                document.getElementById('nameInput').value = '';
-                document.getElementById('addressInput').value = '';
-            } else {
-                alert('Address not found. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching geocode data:', error);
-        });
-});
+}
 

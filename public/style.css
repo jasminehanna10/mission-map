@@ -38,7 +38,7 @@ h2 {
     padding: 10px; /* Padding around the subheading */
     display: inline-block; /* Allows the element to be centered */
     margin: 0 auto; /* Centers the box horizontally */
-    text-align: center; /* Ensures text inside is centered */
+	text-align: center; /* Ensures text inside is centered */
 }
 
 /* Map styling */
@@ -50,42 +50,45 @@ h2 {
 }
 
 /* Form styling */
-#input-form {
-    margin-top: 20px; /* Adds space above the map */
+/* Input box styling */
+#inputs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+input[type="text"] {
+    width: 300px; /* Adjust the width of the input boxes */
+    padding: 10px; /* Padding for better appearance */
+    margin-bottom: 10px; /* Space between the input boxes */
+    border: 1px solid #85161f; /* Border color matching theme */
+    border-radius: 5px; /* Rounded corners for better look */
+}
+
+button {
+    width: 150px; /* Make the button smaller */
     padding: 10px;
-    background-color: rgba(255, 255, 255, 0.8); /* Light background for form */
-    border-radius: 8px; /* Rounded corners for the form */
-    display: inline-block;
-    text-align: center; /* Center text inside the form */
-    margin: 0 auto; /* Centers the form */
-    width: 60%; /* Limit form width */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
-}
-
-#input-form label {
-    font-size: 1em;
-    color: #333;
-    margin-right: 10px;
-}
-
-#input-form input {
-    margin: 5px 0;
-    padding: 10px;
-    width: 300px; /* Width for the input boxes */
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-#input-form button {
-    padding: 10px 20px;
     background-color: #85161f;
     color: white;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
-    border-radius: 4px;
+    font-weight: bold;
 }
 
-#input-form button:hover {
-    background-color: #9a1d25; /* Slightly darker on hover */
+button:hover {
+    background-color: #a82528; /* Slightly lighter color on hover */
 }
+
+/* Center the input section */
+#input-section {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+
 
