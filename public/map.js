@@ -112,8 +112,7 @@ function addPinByAddress() {
             });
     } else {
         alert("Please fill out both name and address fields.");
-    }
-}
+    }}
 
 });
 
