@@ -42,7 +42,7 @@ document.getElementById('addMissionBtn').addEventListener('click', function() {
     }
     
     // Use an API like OpenCage to get lat/lng from address
-    fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=YOUR_API_KEY`)
+    fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=c21d1bb174d74027af4df2ce25cde9a`)
         .then(response => response.json())
         .then(data => {
             if (data.results.length > 0) {
