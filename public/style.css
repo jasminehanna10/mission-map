@@ -2,7 +2,7 @@
 body {
     text-align: center; /* Centers text globally */
     font-family: Arial, sans-serif; /* Cleaner font */
-    background-image: url('brownMap.jpg'); /* Set background image */
+    background-image: url('images/brownMap.jpg'); /* Set background image */
     background-size: cover; /* Ensure the image covers the entire background */
     background-position: center; /* Center the background image */
     background-repeat: no-repeat; /* Prevent the image from repeating */

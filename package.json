@@ -12,7 +12,7 @@
   "description": "A mission map for the 2024 MEC Fall Conference to serve as a live feed map.",
   "dependencies": {
     "express": "^4.19.2",
+    "mongodb": "^6.8.1",
     "socket.io": "^4.7.5"
   }
 }
-
