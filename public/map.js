@@ -21,12 +21,12 @@ async function geocodeAddress(address) {
     }
 }
 
-// Initialize the map and set it to Los Angeles/Orange County
+// Initialize the map and set it to show from Fresno to Tijuana, centered around LA/OC
 var map = L.map('map', {
-    center: [33.6846, -117.8265],  // Coordinates near Orange County, CA
-    zoom: 10,  // Zoom level to focus on LA/OC
-    minZoom: 9,  // Minimum zoom level to prevent zooming too far out
-    maxZoom: 12  // Maximum zoom level to prevent zooming too far in
+    center: [34.0522, -118.2437],  // Centered near Los Angeles
+    zoom: 8,  // Zoom out to show from Fresno to Tijuana
+    minZoom: 7,  // Minimum zoom level (to prevent zooming too far out)
+    maxZoom: 12  // Maximum zoom level (for detailed views of cities)
 });
 
 // Add OpenStreetMap tiles
@@ -34,13 +34,13 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// Set bounds for Southern California
+// Set bounds from Fresno (north) to Tijuana (south), Catalina Island (west) to Palm Springs (east)
 var californiaBounds = [
-    [32.5343, -124.4096],  // Southwest corner
-    [35.0000, -116.0000]   // Northeast corner (adjusted for SoCal)
+    [32.5343, -118.6],  // Southwest corner (near Tijuana and Catalina Island)
+    [37.0, -115.0]      // Northeast corner (near Fresno and Palm Springs)
 ];
-map.setMaxBounds(californiaBounds);
-map.fitBounds(californiaBounds); // Ensure map is centered within these bounds
+map.setMaxBounds(californiaBounds);  // Restrict map bounds
+map.fitBounds(californiaBounds);     // Ensure the map starts within these bounds
 
 // Function to add a marker and include a removal button in the popup
 function addMarkerToMap(data) {
