@@ -51,13 +51,14 @@ var socalBounds = [
     [37.5, -114.1315]      // Northeast corner (around Fresno)
 ];
 
-// Restrict the map view to Southern California bounds
+// Initialize the map centered on Southern California
 var map = L.map('map', {
-    maxBounds: socalBounds,
-    zoomControl: true,
-    minZoom: 6,  // Limit how far out they can zoom
-    maxZoom: 12  // Limit how close they can zoom in
-}).setView([34.0522, -118.2437], 8); // Initial view centered on Los Angeles
+    center: [34.0522, -118.2437],  // Center on Los Angeles
+    zoom: 7,  // A good zoom level for Southern California
+    maxBounds: socalBounds,  // Limit map movement to SoCal
+    maxZoom: 11,  // Maximum zoom level
+    minZoom: 6  // Minimum zoom level to prevent zooming out too far
+});
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
@@ -73,7 +74,7 @@ document.getElementById('addPinBtn').addEventListener('click', function () {
         return;
     }
 
-    fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=YOUR_API_KEY`)
+    fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=c21d1bb174d74027af4df2ce25cde9a`)
         .then(response => response.json())
         .then(data => {
             if (data.results.length > 0) {
