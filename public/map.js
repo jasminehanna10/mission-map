@@ -4,7 +4,7 @@ var map = L.map('map', {
     zoom: 7, // Starting zoom level
     minZoom: 6, // Minimum zoom level (to prevent zooming out too far)
     maxZoom: 14, // Maximum zoom level (to prevent zooming in too close)
-    maxBounds: [[32.5343, -124.4096], [42.0095, -114.1315]], // Boundaries of California
+    maxBounds: [[32.5343, -124.4096], [36.7378, -119.7871]], // Boundaries of California
 });
 
 // Add OpenStreetMap tiles
@@ -14,7 +14,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 map.setMaxBounds([
     [32.5343, -124.4096],  // Southwest corner of California
-    [42.0095, -114.1315]   // Northeast corner of California
+    [36.7378, -119.7871]   // Northeast corner of California
 ]);
 
 // Fetch function to get geocoded coordinates
