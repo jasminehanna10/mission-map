@@ -1,4 +1,3 @@
-// Add OpenCage API Key
 const API_KEY = 'c21d1bb174d74027af4df2ce25cde9a1';
 
 // Function to handle geocoding
@@ -21,13 +20,20 @@ async function geocodeAddress(address) {
     }
 }
 
-// Prompt for user name and address
-async function addPin() {
-    const userName = prompt('Please enter your name:');
-    const userAddress = prompt('Please enter your address:');
+// Set map view for California/Southern California boundaries
+var map = L.map('map').setView([34.0522, -118.2437], 9);  // Example coordinates for SoCal
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Handle form submission
+document.getElementById('pin-form').addEventListener('submit', async function(event) {
+    event.preventDefault();  // Prevent the form from reloading the page
+
+    const userName = document.getElementById('userName').value;
+    const userAddress = document.getElementById('userAddress').value;
 
     if (userName && userAddress) {
-        // Call geocoding API to get latitude and longitude
         const location = await geocodeAddress(userAddress);
         if (location) {
             // Emit the new mission event with the coordinates and user info
@@ -38,10 +44,7 @@ async function addPin() {
             });
         }
     }
-}
-
-// Call the addPin function when the page loads or when triggered
-addPin();
+});
 
 // Listen for updates from the server to update the map
 socket.on('update map', function (data) {
